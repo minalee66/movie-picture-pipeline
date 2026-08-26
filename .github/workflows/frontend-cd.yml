@@ -59,7 +59,12 @@ jobs:
           sudo mv kubectl /usr/local/bin/
       - name: Update kubeconfig
         run: |
-          aws eks update-kubeconfig --name ${{ secrets.EKS_CLUSTER_NAME }} --region ${{ secrets.AWS_REGION }}
+          mkdir -p $HOME/.kube
+          aws eks update-kubeconfig --name ${{ secrets.EKS_CLUSTER_NAME }} --region ${{ secrets.AWS_REGION }} --kubeconfig $HOME/.kube/config
+      - name: Verify kubeconfig
+        run: |
+          kubectl config view
+          kubectl cluster-info
       - name: Deploy to Kubernetes
         run: |
           kubectl set image deployment/frontend-deployment frontend=${{ secrets.ECR_REGISTRY }}:${{ github.sha }}
